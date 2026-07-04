@@ -1,0 +1,16 @@
+import DashboardHeader from "@/components/DasboardHeader";
+import Sidebar from "@/components/Sidebar";
+
+
+export default function DashboardLayout({ children }) {
+  return (
+    <div className="flex min-h-screen">
+      <Sidebar />
+
+      <div className="flex-1">
+        <DashboardHeader />
+        <main className="p-6">{children}</main>
+      </div>
+    </div>
+  );
+}
