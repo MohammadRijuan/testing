@@ -1,51 +1,57 @@
 "use client";
 
 import { useSession, signOut } from "next-auth/react";
-import { useState } from "react";
-import BannerModal from "./BannerModal";
 import Link from "next/link";
 
 export default function Navbar() {
-  const [open, setOpen] = useState(false);
-
   const { data: session, status } = useSession();
 
   return (
-    <div className="p-4 bg-gray-900 text-white flex justify-between items-center">
-      <h1>Navbar</h1>
+    <nav className="bg-gray-900 text-white shadow-md">
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
 
-      <div className="flex items-center gap-4">
-        <button onClick={() => setOpen(true)}>
-          Add Banner
-        </button>
+        <Link href="/" className="text-2xl font-bold">
+          Testing
+        </Link>
 
-        {status === "loading" ? (
-          <p>Loading...</p>
-        ) : session ? (
-          <>
-            <span>Welcome, {session.user?.name}</span>
+        <div className="flex items-center gap-5">
 
-            <button
-              onClick={() => signOut({ callbackUrl: "/login" })}
-              className="hover:underline"
-            >
-              Logout
-            </button>
-          </>
-        ) : (
-          <>
-            <Link href="/login" className="hover:underline">
-              Login
-            </Link>
+          {status === "loading" ? (
+            <p>Loading...</p>
+          ) : session ? (
+            <>
+              <span className="text-gray-300">
+                Welcome, {session.user?.name}
+              </span>
 
-            <Link href="/register" className="hover:underline">
-              Register
-            </Link>
-          </>
-        )}
+              <button
+                onClick={() => signOut({ callbackUrl: "/" })}
+                className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="hover:text-blue-400 transition"
+              >
+                Login
+              </Link>
+
+              <Link
+                href="/register"
+                className="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg transition"
+              >
+                Register
+              </Link>
+            </>
+          )}
+
+        </div>
+
       </div>
-
-      {open && <BannerModal onClose={() => setOpen(false)} />}
-    </div>
+    </nav>
   );
 }

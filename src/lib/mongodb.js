@@ -12,20 +12,32 @@ import { MongoClient, ServerApiVersion } from "mongodb";
 
 export const collectionNamesObj = {
   servicesCollection: "test_services",
-  userCollection: "users", 
+  userCollection: "users",
 };
-    
-export default function dbConnect(collectionName) {
-  const uri = process.env.MONGODB_URI;
 
-  const client = new MongoClient(uri, {
+const uri = process.env.MONGODB_URI;
+const dbName = process.env.DB_NAME;
+
+let client;
+let clientPromise;
+
+if (!global._mongoClientPromise) {
+  client = new MongoClient(uri, {
     serverApi: {
       version: ServerApiVersion.v1,
       strict: true,
       deprecationErrors: true,
-    }
+    },
   });
 
-  // Dynamically targets your database name and the requested collection
-  return client.db(process.env.DB_NAME).collection(collectionName);
+  global._mongoClientPromise = client.connect();
+}
+
+// reusable connection
+clientPromise = global._mongoClientPromise;
+
+
+export default async function dbConnect(collectionName) {
+  const client = await clientPromise;
+  return client.db(dbName).collection(collectionName);
 }

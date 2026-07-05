@@ -1,32 +1,51 @@
-"use server"
+"use server";
 
 import dbConnect, { collectionNamesObj } from "@/lib/mongodb";
-import bcrypt from "bcryptjs"; 
+import { sendWelcomeEmail } from "@/lib/sendEmail";
+import bcrypt from "bcryptjs";
+
 
 export const registerUser = async (payload) => {
-  const userCollection = dbConnect(collectionNamesObj.userCollection)
+  const userCollection = await dbConnect(collectionNamesObj.userCollection);
 
   const { name, email, password } = payload;
-  if (!email || !password) return null;
 
+  if (!email || !password) {
+    return {
+      success: false,
+      message: "Missing information",
+    };
+  }
 
-  const user = await userCollection.findOne({ email });
-  if (user) return null;
+  const exists = await userCollection.findOne({ email });
 
+  if (exists) {
+    return {
+      success: false,
+      message: "Email already exists",
+    };
+  }
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-
-  const safePayload = {
+  const newUser = {
     name,
     email,
     password: hashedPassword,
+
+    // automatic role
+    role: "user",
+
+    createdAt: new Date(),
   };
 
-  const result = await userCollection.insertOne(safePayload);
+  const result = await userCollection.insertOne(newUser);
+
+  await sendWelcomeEmail(name, email);
+
   
+
   return {
-    acknowledged: result.acknowledged,
-    insertedId: result.insertedId.toString(),
+    success: result.acknowledged,
   };
 };

@@ -1,92 +1,167 @@
 "use client";
 
+import { useState } from "react";
 import { registerUser } from "@/app/actions/auth/registerUser";
+import { signIn } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
 
 export default function Register() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => { 
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const form = e.target;
-    
-    const name = form.name.value;
-    const email = form.email.value;
-    const password = form.password.value;
 
-    registerUser({ name, email, password }); 
+    if (loading) return;
+
+    setLoading(true);
+
+    const form = e.target;
+
+    const user = {
+      name: form.name.value,
+      email: form.email.value,
+      password: form.password.value,
+    };
+
+    try {
+      // Register user
+      const result = await registerUser(user);
+
+      if (!result?.success) {
+        Swal.fire({
+          icon: "error",
+          title: "Registration Failed",
+          text: result?.message || "Something went wrong.",
+          confirmButtonColor: "#dc2626",
+        });
+
+        setLoading(false);
+        return;
+      }
+
+      // Automatically login
+      const loginResult = await signIn("credentials", {
+        email: user.email,
+        password: user.password,
+        redirect: false,
+      });
+
+      if (!loginResult?.ok) {
+        Swal.fire({
+          icon: "warning",
+          title: "Account Created",
+          text: "Your account was created successfully, but automatic login failed. Please login manually.",
+        });
+
+        router.push("/login");
+        return;
+      }
+
+      form.reset();
+
+      await Swal.fire({
+        icon: "success",
+        title: "Registration Successful!",
+        text: `Welcome ${user.name}!`,
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
+      router.push("/");
+      router.refresh();
+    } catch (error) {
+      console.error(error);
+
+      Swal.fire({
+        icon: "error",
+        title: "Oops!",
+        text: "Something went wrong. Please try again.",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gray-950 p-4 text-white">
-      <div className="w-full max-w-md bg-gray-900 border border-gray-800 rounded-xl p-6 sm:p-8 space-y-6">
-        
-        <div className="space-y-1">
-          <h1 className="text-2xl font-bold tracking-tight">Create an account</h1>
-          <p className="text-sm text-gray-400">
+    <div className="min-h-screen flex items-center justify-center bg-gray-950 text-white px-4">
+      <div className="w-full max-w-md bg-gray-900 border border-gray-800 rounded-xl p-8">
+
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold">Create an Account</h1>
+
+          <p className="text-gray-400 mt-2">
             Already have an account?{" "}
-            <Link href="/login" className="text-blue-500 hover:underline">
-              Log in
+            <Link
+              href="/login"
+              className="text-blue-500 hover:text-blue-400 hover:underline"
+            >
+              Login
             </Link>
           </p>
         </div>
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          
-          {/* Full Name Field */}
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="name" className="text-sm font-medium text-gray-300">
+        <form onSubmit={handleSubmit} className="space-y-5">
+
+          <div>
+            <label className="block mb-2 text-sm">
               Full Name
             </label>
+
             <input
-              id="name"
-              name="name"
               type="text"
-              placeholder="John Doe"
+              name="name"
               required
-              className="w-full px-3.5 py-2 rounded-lg bg-gray-950 border border-gray-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition"
+              placeholder="John Doe"
+              className="w-full rounded-lg border border-gray-700 bg-gray-950 px-4 py-2 outline-none focus:border-blue-500"
             />
           </div>
 
-          {/* Email Field */}
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="email" className="text-sm font-medium text-gray-300">
+          <div>
+            <label className="block mb-2 text-sm">
               Email Address
             </label>
+
             <input
-              id="email"
-              name="email"
               type="email"
-              placeholder="you@example.com"
+              name="email"
               required
-              className="w-full px-3.5 py-2 rounded-lg bg-gray-950 border border-gray-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition"
+              placeholder="john@gmail.com"
+              className="w-full rounded-lg border border-gray-700 bg-gray-950 px-4 py-2 outline-none focus:border-blue-500"
             />
           </div>
 
-          {/* Password Field */}
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="password" className="text-sm font-medium text-gray-300">
+          <div>
+            <label className="block mb-2 text-sm">
               Password
             </label>
+
             <input
-              id="password"
-              name="password"
               type="password"
-              placeholder="••••••••"
+              name="password"
               required
-              className="w-full px-3.5 py-2 rounded-lg bg-gray-950 border border-gray-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition"
+              placeholder="********"
+              className="w-full rounded-lg border border-gray-700 bg-gray-950 px-4 py-2 outline-none focus:border-blue-500"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full mt-2 bg-blue-600 hover:bg-blue-500 text-white font-medium py-2 rounded-lg transition"
+            disabled={loading}
+            className={`w-full rounded-lg py-3 font-semibold transition ${
+              loading
+                ? "bg-gray-600 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-500"
+            }`}
           >
-            Register
+            {loading ? "Creating Account..." : "Register"}
           </button>
+
         </form>
 
       </div>
     </div>
   );
 }
-
