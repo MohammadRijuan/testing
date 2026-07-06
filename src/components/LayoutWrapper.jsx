@@ -18,7 +18,15 @@ export default function LayoutWrapper({ children }) {
   return (
     <>
       {!hideLayout && <Navbar />}
-      {children}
+      <div 
+        className={
+          hideLayout 
+            ? "w-full flex-1" 
+            : "w-full max-w-[1340px] mx-auto px-4 sm:px-6 lg:px-5 flex-1"
+        }
+      >
+        {children}
+      </div>
       {!hideLayout && <Footer />}
     </>
   );
