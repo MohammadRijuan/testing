@@ -52,7 +52,7 @@ export async function forgotPassword(email) {
     );
 
     // Reset link sent to the user
-    const resetLink = `http://localhost:3000/reset-password?token=${rawToken}`;
+    const resetLink = `https://brokerbay.vercel.app/reset-password?token=${rawToken}`;
 
     // Send email
     await sendResetEmail(user.name, user.email, resetLink);
