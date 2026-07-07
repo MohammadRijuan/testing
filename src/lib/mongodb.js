@@ -14,6 +14,7 @@ export const collectionNamesObj = {
   servicesCollection: "test_services",
   userCollection: "users",
   heroBannerCollection: "hero_banners",
+  productsCollection: "products",
 };
 
 const uri = process.env.MONGODB_URI;

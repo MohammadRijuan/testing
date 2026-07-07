@@ -33,7 +33,6 @@ export default function Sidebar({ isOpen, onClose }) {
       {/* Sidebar Header Section */}
       <div className="mb-8 px-2 flex items-center justify-between">
         <h2 className="text-lg font-bold tracking-tight text-white flex items-center gap-2.5">
-          
           <Link
             href="/"
             className="text-2xl font-bold tracking-tight text-white hover:opacity-90 transition"
@@ -105,6 +104,52 @@ export default function Sidebar({ isOpen, onClose }) {
           </svg>
           <span>Hero Banner</span>
         </Link>
+
+        {/* users */}
+        {/* Users Link */}
+        <Link
+          href="/dashboard/users"
+          className={getLinkClass("/dashboard/users")}
+        >
+          <svg
+            className={getIconClass("/dashboard/users")}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M18 18.72A8.97 8.97 0 0 0 12 16.5a8.97 8.97 0 0 0-6 2.22M15.75 6.75a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
+            />
+          </svg>
+
+          <span>Users</span>
+        </Link>
+
+        {/* products */}
+        <Link
+          href="/dashboard/products"
+          className={getLinkClass("/dashboard/products")}
+        >
+          <svg
+            className={getIconClass("/dashboard/products")}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M18 18.72A8.97 8.97 0 0 0 12 16.5a8.97 8.97 0 0 0-6 2.22M15.75 6.75a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
+            />
+          </svg>
+
+          <span>Products</span>
+        </Link>
+
       </nav>
 
       {/* Persistent Tiny Brand Signature */}

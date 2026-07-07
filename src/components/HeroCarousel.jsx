@@ -8,25 +8,19 @@ export default function HeroCarousel() {
   const axios = useAxios();
   const [current, setCurrent] = useState(0);
 
-  // =========================
   // FETCH BANNERS FROM API
-  // =========================
   const { data: banners = [], isLoading } = useQuery({
-  queryKey: ["hero-banners"],
-  queryFn: async () => {
-    const res = await axios.get("/hero-banners");
-    return res.data.data; // ⬅ unwrap the array
-  },
-});
+    queryKey: ["hero-banners"],
+    queryFn: async () => {
+      const res = await axios.get("/hero-banners");
+      return res.data.data; 
+    },
+  });
 
   // fallback (optional safety)
-  const safeBanners = banners.length
-    ? banners
-    : [];
+  const safeBanners = banners.length ? banners : [];
 
-  // =========================
   // AUTO SLIDER
-  // =========================
   const nextBanner = useCallback(() => {
     if (!safeBanners.length) return;
 
@@ -53,9 +47,7 @@ export default function HeroCarousel() {
     setCurrent(0);
   }, [safeBanners.length]);
 
-  // =========================
   // LOADING STATE
-  // =========================
   if (isLoading) {
     return (
       <div className="h-[500px] w-full rounded-3xl bg-slate-900 animate-pulse" />
@@ -71,7 +63,7 @@ export default function HeroCarousel() {
   }
 
   return (
-    <section className="w-full relative min-h-[500px] md:min-h-[560px] flex items-center overflow-hidden rounded-3xl border border-slate-800 bg-slate-950 select-none my-6 shadow-sm">
+    <section className="w-full relative min-h-[500px] md:min-h-[560px] flex items-center overflow-hidden rounded-xl bg-slate-950 select-none my-6 shadow-sm">
 
       {/* BACKGROUND IMAGES */}
       <div className="absolute inset-0 w-full h-full z-0">
@@ -92,7 +84,8 @@ export default function HeroCarousel() {
           </div>
         ))}
 
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent z-20" />
+        {/* Subtle dark gradient overlay ONLY on the left side to keep text highly legible */}
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/70 via-slate-950/30 to-transparent z-20" />
       </div>
 
       {/* STATIC CONTENT */}
@@ -122,21 +115,40 @@ export default function HeroCarousel() {
         </div>
       </div>
 
-      {/* CONTROLS */}
-      <div className="absolute bottom-8 right-8 z-40 flex gap-2">
-
+      {/* RE-DESIGNED PREMIUM CAROUSEL BUTTONS */}
+      <div className="absolute bottom-8 right-8 z-40 flex items-center gap-1 p-1.5 bg-slate-950/40 backdrop-blur-xl border border-white/5 rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+        
         <button
           onClick={prevBanner}
-          className="w-10 h-10 rounded-xl bg-slate-900/40 border border-slate-800 text-slate-300"
+          className="group w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all duration-300 active:scale-90"
+          aria-label="Previous slide"
         >
-          ←
+          <svg 
+            className="w-4 h-4 transition-transform duration-300 transform group-hover:-translate-x-0.5 ease-out" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
         </button>
+
+        {/* Divider dot */}
+        <div className="w-[1px] h-4 bg-white/10 mx-0.5" />
 
         <button
           onClick={nextBanner}
-          className="w-10 h-10 rounded-xl bg-slate-900/40 border border-slate-800 text-slate-300"
+          className="group w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all duration-300 active:scale-90"
+          aria-label="Next slide"
         >
-          →
+          <svg 
+            className="w-4 h-4 transition-transform duration-300 transform group-hover:translate-x-0.5 ease-out" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
         </button>
 
       </div>
